@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathieu IPO Landing</title>
+<style>
+body{margin:0;font-family:Arial;background:#0b1020;color:white;text-align:center}
+#hud{padding:10px}
+canvas{background:linear-gradient(#001,#113);display:block;margin:auto}
+button{padding:10px 16px;margin:5px}
+</style>
+</head>
+<body>
+<div id="hud">
+<h2>🚀 Mathieu IPO Landing</h2>
+<div>Carburant: <span id="fuel">100</span> | Altitude: <span id="alt">1000</span> m | Vitesse: <span id="spd">0</span></div>
+<button onclick="boost()">🔥 BOOST</button>
+<button onclick="location.reload()">🔄 Rejouer</button>
+</div>
+<canvas id="game" width="420" height="700"></canvas>
+<script>
+const c=document.getElementById('game'),ctx=c.getContext('2d');
+let y=80, vy=0, fuel=100, alt=1000, ended=false;
+function boost(){ if(fuel>0&&!ended){ vy-=0.8; fuel-=1; } }
+document.addEventListener('keydown',e=>{if(e.code==='Space')boost();});
+
+function draw(){
+ctx.clearRect(0,0,c.width,c.height);
+ctx.fillStyle='orange'; ctx.fillRect(190,y,40,80);
+ctx.fillStyle='gray'; ctx.fillRect(170,y+15,20,15); ctx.fillRect(230,y+15,20,15);
+ctx.fillStyle='green'; ctx.fillRect(0,650,420,50);
+
+vy += 0.15;
+y += vy;
+alt = Math.max(0, Math.round((650-y)*2));
+
+document.getElementById('fuel').textContent=Math.round(fuel);
+document.getElementById('alt').textContent=alt;
+document.getElementById('spd').textContent=vy.toFixed(1);
+
+if(y>=570 && !ended){
+ ended=true;
+ let msg="";
+ if(Math.abs(vy)<2) msg="🏝️ Retraite à Bali ! Mathieu a réussi l'IPO.";
+ else if(Math.abs(vy)<4) msg="💼 Retour au bureau... atterrissage moyen.";
+ else msg="💥 RUD ! Fusée détruite comme un mauvais trade FOMO.";
+ setTimeout(()=>alert(msg),100);
+}
+
+if(!ended) requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
