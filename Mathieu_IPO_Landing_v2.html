@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathieu IPO Landing</title>
+<style>
+body{margin:0;background:#08111f;color:white;font-family:Arial;text-align:center;overflow:hidden}
+#msg{position:absolute;top:10px;left:0;right:0;font-size:22px;font-weight:bold}
+canvas{display:block;margin:auto;background:linear-gradient(#001428,#16365f)}
+</style>
+</head>
+<body>
+<div id="msg">🚀 IPO SpaceX validée... Décollage en cours...</div>
+<canvas id="c" width="420" height="800"></canvas>
+<script>
+const c=document.getElementById("c"),ctx=c.getContext("2d");
+let phase="launch";
+let y=650, vy=-4;
+let fuel=100;
+let score=0;
+
+function boost(){
+ if(phase==="landing" && fuel>0){
+   vy-=0.35;
+   fuel-=0.8;
+ }
+}
+document.addEventListener("keydown",e=>{if(e.code==="Space")boost();});
+document.addEventListener("pointerdown",boost);
+
+function drawRocket(){
+ ctx.fillStyle="white";
+ ctx.fillRect(195,y,30,70);
+ ctx.fillStyle="gray";
+ ctx.fillRect(185,y+10,10,15);
+ ctx.fillRect(225,y+10,10,15);
+}
+
+function loop(){
+ requestAnimationFrame(loop);
+ ctx.clearRect(0,0,c.width,c.height);
+
+ // ground
+ ctx.fillStyle="#2a7";
+ ctx.fillRect(0,740,c.width,60);
+
+ if(phase==="launch"){
+   y+=vy;
+   if(y<150){
+      phase="landing";
+      vy=0;
+      document.getElementById("msg").innerHTML=
+      "⚠️ IPO OUVERTE ! PRENDS LES COMMANDES<br>Tap ou ESPACE pour ralentir la descente";
+   }
+ }
+
+ else if(phase==="landing"){
+   vy+=0.12; // gravity
+   y+=vy;
+
+   ctx.fillStyle="white";
+   ctx.fillText("⛽ "+Math.round(fuel)+"%",10,30);
+   ctx.fillText("Vitesse: "+vy.toFixed(1)+" m/s",10,50);
+
+   if(y>=670){
+      phase="end";
+      let txt="";
+      if(Math.abs(vy)<2){
+         txt="🏝️ RETRAITE À BALI — Mathieu a réussi son IPO !";
+         score=1000-Math.round(Math.abs(vy)*100)-(100-fuel);
+      }else if(Math.abs(vy)<5){
+         txt="💼 Encore quelques années au bureau.";
+         score=500-Math.round(Math.abs(vy)*50);
+      }else{
+         txt="💥 RUD ! Retour au bureau lundi.";
+         score=0;
+      }
+      document.getElementById("msg").innerHTML=txt+"<br>🏆 Score: "+Math.max(0,Math.round(score));
+   }
+ }
+
+ drawRocket();
+}
+loop();
+</script>
+</body>
+</html>
